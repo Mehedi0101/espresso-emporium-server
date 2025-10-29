@@ -5,10 +5,15 @@ require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 5000;
 
-app.use(cors());
+app.use(cors({
+    origin: [
+        'https://statuesque-semolina-221757.netlify.app',
+        'http://localhost:5173'
+    ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true
+}));
 app.use(express.json());
-
-// const uri = `mongodb+srv://${process.env.USER}:${process.env.PASSWORD}@cluster0.gxsfvvy.mongodb.net/?retryWrites=true&w=majority`;
 
 const uri = `mongodb+srv://${process.env.USER}:${process.env.PASSWORD}@mycluster.blpor7q.mongodb.net/?appName=MyCluster`;
 
@@ -25,20 +30,20 @@ async function run() {
 
         const coffeeCollection = client.db("coffeeDB").collection("coffees");
 
-        app.get('/coffees',async(req,res)=>{
+        app.get('/coffees', async (req, res) => {
             const cursor = coffeeCollection.find();
             const result = await cursor.toArray();
             res.send(result);
         })
 
-        app.get('/coffees/:id',async(req,res)=>{
+        app.get('/coffees/:id', async (req, res) => {
             const id = req.params.id;
             const query = new ObjectId(id);
             const result = await coffeeCollection.findOne(query);
             res.send(result);
         })
 
-        app.post('/coffees',async(req,res)=>{
+        app.post('/coffees', async (req, res) => {
             const coffee = req.body;
             const result = await coffeeCollection.insertOne(coffee);
             res.send(result);
